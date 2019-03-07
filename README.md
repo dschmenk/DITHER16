@@ -21,3 +21,12 @@ This algorithm was written with clarity in mind, not extreme speed. It is much c
 Lastly, the Portable PixMap read routine is an abomination. It doesn't allow for comments in the header, which The GIMP will add. To use a PBM formatted image (extension .pnm in The GIMP), you must remove the comments.
 
 Sorry.
+
+====================================================================================
+
+Here are the results:
+
+Color Bars #1
+
+![Original Color Bars](https://github.com/dschmenk/DITHER16/images/bars1.pnm)
+![Dithered Color Bars](https://github.com/dschmenk/DITHER16/images/bars1.png)
