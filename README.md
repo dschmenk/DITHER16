@@ -12,7 +12,7 @@ The colors are mapped so they can be additive: the same bit set in plane 0 as in
 
 I can see two issues with this algorithm:
 
-+ The colors are symetrical around 128 leading to a double mapping of brushes. 0x70-0x7F look suspiciously like 0x80-0x8F. This is actually the solid colors mapped to the palette so I don't think it's a horrible problem, but you can see it in certain smooth gradients.
++ The colors are symmetrical around 128 leading to a double mapping of brushes. 0x70-0x7F look suspiciously like 0x80-0x8F. This is actually the solid colors mapped to the palette so I don't think it's a horrible problem, but you can see it in certain smooth gradients.
 
 + Palette entry 0x08 doesn't get used in building the brushes. This is the equivalent of Bright Black. The Windows driver doesn't use it either for the dithered brush. However, it is used for the "best match" when a solid color value is needed. So I added a "best match" to this brush building routine and return that as a value, too.
 
