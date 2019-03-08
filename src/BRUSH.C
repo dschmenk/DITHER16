@@ -162,8 +162,8 @@ unsigned char buildbrush(unsigned char red, unsigned char grn, unsigned blu, uns
  */
 void setpixel(int x, int y, unsigned char red, unsigned char grn, unsigned char blu)
 {
-	int ofs;
-	volatile unsigned char dummy;
+    int ofs;
+    volatile unsigned char dummy;
     unsigned char pixbrush[4][4], pix, idx;
 
     idx = buildbrush(red, grn, blu, (unsigned long *)pixbrush);
@@ -180,52 +180,52 @@ void setpixel(int x, int y, unsigned char red, unsigned char grn, unsigned char 
     outpw(0x3CE, pixmask[x & 0x07]);
     ofs         = y * 80 + (x >> 3);
     dummy       = vidmem[ofs];
-	vidmem[ofs] = pix; // Use idx here to see "best match" color
+    vidmem[ofs] = pix; // Use idx here to see "best match" color
 }
 /*
  * World's dumbest routine to read PNM file.
  */
 int main(int argc, char **argv)
 {
-	FILE *pbmfile;
-	int pbmwidth, pbmheight, pbmdepth;
-	int xorg, yorg, x, y;
-	unsigned char r, g, b;
+    FILE *pbmfile;
+    int pbmwidth, pbmheight, pbmdepth;
+    int xorg, yorg, x, y;
+    unsigned char r, g, b;
 
-	if (argc > 1)
-	{
-		if ((pbmfile = fopen(argv[1], "rb")) == NULL)
-		{
-			fprintf(stderr, "Can't open %s\n", argv[1]);
-			return -1;
-		}
-	}
-	else
-		pbmfile = stdin;
-	if (fscanf(pbmfile, "P6\n%d\n%d\n%d\n", &pbmwidth, &pbmheight, &pbmdepth) != 3)
-	{
-		fprintf(stderr, "Not a valid PBM file.\n");
-		return -1;
-	}
-	if (pbmwidth > 640 || pbmheight > 480)
-	{
-		fprintf(stderr, "PBM too large to  display.n");
-		return -1;
-	}
-	xorg = 320 - (pbmwidth / 2);
-	yorg = 240 - (pbmheight / 2);
-	setmode();
-	for (y = 0; y < pbmheight; y++)
-		for (x = 0; x < pbmwidth; x++)
+    if (argc > 1)
+    {
+        if ((pbmfile = fopen(argv[1], "rb")) == NULL)
+        {
+            fprintf(stderr, "Can't open %s\n", argv[1]);
+            return -1;
+        }
+    }
+    else
+        pbmfile = stdin;
+    if (fscanf(pbmfile, "P6\n%d\n%d\n%d\n", &pbmwidth, &pbmheight, &pbmdepth) != 3)
+    {
+        fprintf(stderr, "Not a valid PBM file.\n");
+        return -1;
+    }
+    if (pbmwidth > 640 || pbmheight > 480)
+    {
+        fprintf(stderr, "PBM too large to  display.n");
+        return -1;
+    }
+    xorg = 320 - (pbmwidth / 2);
+    yorg = 240 - (pbmheight / 2);
+    setmode();
+    for (y = 0; y < pbmheight; y++)
+        for (x = 0; x < pbmwidth; x++)
         {
             r = getc(pbmfile);
             g = getc(pbmfile);
             b = getc(pbmfile);
-			setpixel(x + xorg, y + yorg, r, g, b);
+            setpixel(x + xorg, y + yorg, r, g, b);
         }
-	getch();
-	restoremode();
-	return 0;
+    getch();
+    restoremode();
+    return 0;
 }
 
 
