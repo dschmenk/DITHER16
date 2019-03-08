@@ -28,5 +28,5 @@ Here are the results:
 
 Color Bars #1
 
-![Original Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/bars1.pbm)
+![Original Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/bars1.jpg)
 ![Dithered Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/bars1.png)
