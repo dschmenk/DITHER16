@@ -24,7 +24,55 @@ Sorry.
 
 ====================================================================================
 
-Here are the results:
+##Implementation
+
+```
+/*
+ * Build a dithered brush and return the closest solid color match to the RGB.
+ */
+unsigned char buildbrush(unsigned char red, unsigned char grn, unsigned blu, unsigned long *brush)
+{
+    unsigned char clr, v;
+
+    /*
+     * Find MAX(R,G,B)
+     */
+    if (red >= grn && red >= blu)
+        v = red;
+    else if (grn >= red && grn >= blu)
+        v = grn;
+    else // if (blue >= grn && blu >= red)
+        v = blu;
+    if (v > 127) // 50%-100% brightness
+    {
+        /*
+         * Fill brush based on scaled RGB values (brightest -> 100% -> 0x0F).
+         */
+        brush[BRI] = ~dithmask[(~v >> 3) & 0x0F]; // Reverse dither for brightness
+        brush[RED] =  dithmask[(red << 4) / (v + 8)];
+        brush[GRN] =  dithmask[(grn << 4) / (v + 8)];
+        brush[BLU] =  dithmask[(blu << 4) / (v + 8)];
+        clr = 0x08 | ((red & 0x80) >> 5) | ((grn & 0x80) >> 6) | ((blu & 0x80) >> 7);
+    }
+    else // 0%-50% brightness
+    {
+        /*
+         * Fill brush based on RGB values.
+         */
+        brush[BRI] = 0;
+        brush[RED] = dithmask[red >> 3];
+        brush[GRN] = dithmask[grn >> 3];
+        brush[BLU] = dithmask[blu >> 3];
+        clr = ((red & 0x40) >> 4) | ((grn & 0x40) >> 5) | ((blu & 0x40) >> 6);
+        if (clr == 0x00 && red > 31 && grn > 31 && blu > 31)
+            clr = 0x08;
+    }
+    return clr;
+}```
+
+====================================================================================
+
+##Here are the results:
 
 Color Bars #1
 
