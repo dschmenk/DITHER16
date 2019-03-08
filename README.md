@@ -68,7 +68,8 @@ unsigned char buildbrush(unsigned char red, unsigned char grn, unsigned blu, uns
             clr = 0x08;
     }
     return clr;
-}```
+}
+```
 
 ====================================================================================
 
