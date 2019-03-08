@@ -30,3 +30,18 @@ Color Bars #1
 
 ![Original Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/bars1.jpg)
 ![Dithered Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/bars1.png)
+
+Color Bars #2
+
+![Original Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/bars2.jpg)
+![Dithered Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/bars2.png)
+
+Compaq Computers
+
+![Original Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/compaqs.jpg)
+![Dithered Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/compaqs.png)
+
+Race Car
+
+![Original Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/racecar.jpg)
+![Dithered Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/racecar.png)
