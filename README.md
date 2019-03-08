@@ -24,7 +24,7 @@ Sorry.
 
 ====================================================================================
 
-##Implementation
+## Implementation
 
 ```
 /*
@@ -72,7 +72,7 @@ unsigned char buildbrush(unsigned char red, unsigned char grn, unsigned blu, uns
 
 ====================================================================================
 
-##Here are the results:
+## Here are the results:
 
 Color Bars #1
 
