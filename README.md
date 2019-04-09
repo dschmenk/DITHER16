@@ -71,9 +71,9 @@ unsigned char buildbrush(unsigned char red, unsigned char grn, unsigned blu, uns
          */
         if (v < 72 && v > 7 && ((v - red) + (v - grn) + (v - blu) < 12))
         {
-	        /*
-	         * Fill brush with dark grey dither if mostly RGB mostly grey.
-	         */
+	    /*
+	     * Fill brush with dark grey dither if RGB mostly grey.
+	     */
             brush[BRI] = v > 63 ? 0xFFFFFFFFL : bdithmask[(v >> 2) - 1];
             brush[RED] = 0;
             brush[GRN] = 0;
