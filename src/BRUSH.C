@@ -29,16 +29,20 @@
 *                                                                            *
 * I can see two issues with this algorithm:                                  *
 *                                                                            *
+*     [Fixed]                                                                *
 *   + The colors are symmetrical around 128 leading to a double mapping of   *
 *     brushes. 0x70-0x7F look suspiciously like 0x80-0x8F. This is actually  *
 *     the solid colors mapped to the palette so I don't think it's a         *
 *     horrible problem, but you can see it in certain smooth gradients.      *
 *                                                                            *
+*     [Fixed]                                                                *
 *   + Palette entry 0x08 doesn't get used in building the brushes. This is   *
 *     the equivalent of Bright Black. The Windows driver doesn't use it      *
 *     either for the dithered brush. However, it is used for the "best match"*
 *     when a solid color value is needed. So I added a "best match" to this  *
 *     brush building routine and return that as a value, too.                *
+*                                                                            *
+*     Also, fixed the palette so that the dim yellow doesn't look like brown.*
 *                                                                            *
 * This algorithm was written with clarity in mind, not extreme speed. It is  *
 * much clearer (and I'm pretty sure a bit faster) than the mess you would    *
@@ -52,6 +56,8 @@
 \****************************************************************************/
 
 #include <stdio.h>
+#include <math.h>
+#include <dos.h>
 #include <bios.h>
 
 #define BRI     3
@@ -64,7 +70,7 @@ static int orgmode;
 /*
  * 8x4 dither matrix (4x4 replicated twice horizontally to fill byte).
  */
-static unsigned long dithmask[16] =
+static unsigned long ddithmask[16] = // Color dither
 {
     0x00000000L,
     0x88000000L,
@@ -80,8 +86,46 @@ static unsigned long dithmask[16] =
     0xAADDAAFFL,
     0xAAFFAAFFL,
     0xEEFFAAFFL,
+    0xEEFFBBFFL,
     0xEEFFFFFFL,
+};
+static unsigned long bdithmask[16] = // Color dither
+{
+    0x00000000L,
+    0x88000000L,
+    0x88002200L,
+    0x8800AA00L,
+    0xAA00AA00L,
+    0xAA44AA00L,
+    0xAA44AA11L,
+    0xAA44AA55L,
+    0xAA55AA55L,
+    0xAADDAA55L,
+    0xAADDAA77L,
+    0xAADDAAFFL,
+    0xAAFFAAFFL,
+    0xEEFFAAFFL,
+    0xEEFFBBFFL,
     0xFFFFFFFFL
+};
+static unsigned long idithmask[16] = // Brightness dither
+{
+    0x00000000L,
+    0x11000000L,
+    0x11004400L,
+    0x11005500L,
+    0x55005500L,
+    0x55225500L,
+    0x55225588L,
+    0x552255AAL,
+    0x55AA55AAL,
+    0x55BB55AAL,
+    0x55BB55EEL,
+    0x55BB55FFL,
+    0x55FF55FFL,
+    0x77FF55FFL,
+    0x77FFDDFFL,
+    0xFFFFFFFFL,
 };
 static unsigned int pixmask[] =
 {
@@ -90,6 +134,8 @@ static unsigned int pixmask[] =
 void setmode()
 {
     union REGS regs;
+    int c, red, grn, blu;
+
 
     /*
      * Get current mode and set mode 0x12 (640x480x4).
@@ -99,6 +145,25 @@ void setmode()
     orgmode   = regs.h.al;
     regs.x.ax = 0x0012;
     int86(0x10, &regs, &regs);
+    /*
+     * Reprogram palette to better match RGB.
+     */
+    for (c = 0; c < 16; c++)
+    {
+        if (c == 8)
+        {
+            regs.h.bh = 0x38;
+        }
+        else
+        {
+            regs.h.bh  = c & 1 ? (c & 8 ? 0x09 : 0x01) : 0;
+            regs.h.bh |= c & 2 ? (c & 8 ? 0x12 : 0x02) : 0;
+            regs.h.bh |= c & 4 ? (c & 8 ? 0x24 : 0x04) : 0;
+        }
+        regs.h.bl  = c;
+        regs.x.ax  = 0x1000;
+        int86(0x10, &regs, &regs);
+    }
     /*
      * Set write mode 2.
      */
@@ -133,24 +198,41 @@ unsigned char buildbrush(unsigned char red, unsigned char grn, unsigned blu, uns
         /*
          * Fill brush based on scaled RGB values (brightest -> 100% -> 0x0F).
          */
-        brush[BRI] = ~dithmask[(~v >> 3) & 0x0F]; // Reverse dither for brightness
-        brush[RED] =  dithmask[(red << 4) / (v + 8)];
-        brush[GRN] =  dithmask[(grn << 4) / (v + 8)];
-        brush[BLU] =  dithmask[(blu << 4) / (v + 8)];
-        clr = 0x08 | ((red & 0x80) >> 5) | ((grn & 0x80) >> 6) | ((blu & 0x80) >> 7);
+        brush[BRI] = idithmask[(v >> 3) & 0x0F]; //  Bright dither is opposit color dither
+        brush[RED] = bdithmask[(red << 4) / (v + 8)];
+        brush[GRN] = bdithmask[(grn << 4) / (v + 8)];
+        brush[BLU] = bdithmask[(blu << 4) / (v + 8)];
+        clr        = 0x08
+                   | ((red & 0x80) >> 5)
+                   | ((grn & 0x80) >> 6)
+                   | ((blu & 0x80) >> 7);
     }
     else // 0%-50% brightness
     {
         /*
          * Fill brush based on RGB values.
          */
-        brush[BRI] = 0;
-        brush[RED] = dithmask[red >> 3];
-        brush[GRN] = dithmask[grn >> 3];
-        brush[BLU] = dithmask[blu >> 3];
-        clr = ((red & 0x40) >> 4) | ((grn & 0x40) >> 5) | ((blu & 0x40) >> 6);
-        if (clr == 0x00 && red > 31 && grn > 31 && blu > 31)
-            clr = 0x08;
+        if (v < 72 && v > 7 && ((v - red) + (v - grn) + (v - blu) < 12))
+        {
+	        /*
+	         * Fill brush with dark grey dither if mostly RGB mostly grey.
+	         */
+            brush[BRI] = v > 63 ? 0xFFFFFFFFL : bdithmask[(v >> 2) - 1];
+            brush[RED] = 0;
+            brush[GRN] = 0;
+            brush[BLU] = 0;
+            clr        = 0x08;
+        }
+        else
+        {
+            brush[BRI] = 0;
+            brush[RED] = ddithmask[red >> 3];
+            brush[GRN] = ddithmask[grn >> 3];
+            brush[BLU] = ddithmask[blu >> 3];
+            clr        = ((red & 0x40) >> 4)
+                       | ((grn & 0x40) >> 5)
+                       | ((blu & 0x40) >> 6);
+        }
     }
     return clr;
 }
@@ -190,8 +272,24 @@ int main(int argc, char **argv)
     FILE *pbmfile;
     int pbmwidth, pbmheight, pbmdepth;
     int xorg, yorg, x, y;
-    unsigned char r, g, b;
+    unsigned char r, g, b, gamma[256];
+    float gammafunc;
 
+    for (x = 0; x < 256; x++)
+        gamma[x] = x;
+    while (argc > 1 && argv[1][0] == '-')
+    {
+        if (argc > 2 && argv[1][1] == 'g')
+        {
+            gammafunc = atof(argv[2]);
+            for (x = 0; x < 256; x++)
+                gamma[x] = pow((float)x/255.0, gammafunc) * 255.0;
+            argc--;
+            argv++;
+        }
+        argc--;
+        argv++;
+    }
     if (argc > 1)
     {
         if ((pbmfile = fopen(argv[1], "rb")) == NULL)
@@ -218,9 +316,9 @@ int main(int argc, char **argv)
     for (y = 0; y < pbmheight; y++)
         for (x = 0; x < pbmwidth; x++)
         {
-            r = getc(pbmfile);
-            g = getc(pbmfile);
-            b = getc(pbmfile);
+            r = gamma[getc(pbmfile)];
+            g = gamma[getc(pbmfile)];
+            b = gamma[getc(pbmfile)];
             setpixel(x + xorg, y + yorg, r, g, b);
         }
     getch();
@@ -228,4 +326,5 @@ int main(int argc, char **argv)
     return 0;
 }
 
+
 
