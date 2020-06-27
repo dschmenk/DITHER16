@@ -212,16 +212,27 @@ unsigned char buildbrush(unsigned char red, unsigned char grn, unsigned blu, uns
         /*
          * Fill brush based on RGB values.
          */
-        if (v < 72 && v > 7 && ((v - red) + (v - grn) + (v - blu) < 12))
+        if ((v - red) + (v - grn) + (v - blu) < 8)
         {
             /*
              * Fill brush with dark grey dither if RGB mostly grey.
              */
-            brush[BRI] = v > 63 ? 0xFFFFFFFFL : bdithmask[(v >> 2) - 1];
-            brush[RED] = 0;
-            brush[GRN] = 0;
-            brush[BLU] = 0;
-            clr        = 0x08;
+            if (v > 63)
+            {
+                brush[BRI] = ~ddithmask[((v - 64) >> 2)];
+                brush[RED] =
+                brush[GRN] =
+                brush[BLU] =  ddithmask[((v - 64) >> 2)];
+                clr        =  0x08;
+            }
+            else
+            {
+                brush[BRI] = ddithmask[(v >> 2)];
+                brush[RED] = 0;
+                brush[GRN] = 0;
+                brush[BLU] = 0;
+                clr        = 0x00;
+            }
         }
         else
         {

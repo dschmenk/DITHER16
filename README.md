@@ -24,7 +24,7 @@ Finally, the sample program has added a gamma function to adjust the image displ
 Type: `brush -g 1.5 bars.pnm` (inside DOSBox) to apply a power function to darken the displayed image. A value > 1.0 will lighten the image.
 
 This algorithm was written with clarity in mind, not extreme speed. It is much clearer (and I'm pretty sure a bit faster) than the mess you would find in the Windows driver.
- 
+
 Lastly, the Portable PixMap read routine is an abomination. It doesn't allow for comments in the header, which The GIMP will add. To use a PBM formatted image (extension .pnm in The GIMP), you must remove the comments.
 
 Sorry.
@@ -69,16 +69,27 @@ unsigned char buildbrush(unsigned char red, unsigned char grn, unsigned blu, uns
         /*
          * Fill brush based on RGB values.
          */
-        if (v < 72 && v > 7 && ((v - red) + (v - grn) + (v - blu) < 12))
+        if ((v - red) + (v - grn) + (v - blu) < 8)
         {
-	    /*
-	     * Fill brush with dark grey dither if RGB mostly grey.
-	     */
-            brush[BRI] = v > 63 ? 0xFFFFFFFFL : bdithmask[(v >> 2) - 1];
-            brush[RED] = 0;
-            brush[GRN] = 0;
-            brush[BLU] = 0;
-            clr        = 0x08;
+            /*
+             * Fill brush with dark grey dither if RGB mostly grey.
+             */
+            if (v > 63)
+            {
+                brush[BRI] = ~ddithmask[((v - 64) >> 2)];
+                brush[RED] =
+                brush[GRN] =
+                brush[BLU] =  ddithmask[((v - 64) >> 2)];
+                clr        =  0x08;
+            }
+            else
+            {
+                brush[BRI] = ddithmask[(v >> 2)];
+                brush[RED] = 0;
+                brush[GRN] = 0;
+                brush[BLU] = 0;
+                clr        = 0x00;
+            }
         }
         else
         {
