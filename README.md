@@ -126,11 +126,11 @@ Color Bars #2
 Compaq Computers
 
 ![Original Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/compaqs.jpg)
-(gamma 2.0):
+(gamma 1.4):
 ![Dithered Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/compaqs.a.png)
 
 Race Car
 
 ![Original Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/racecar.jpg)
-(gamma 2.0):
+(gamma 1.4):
 ![Dithered Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/racecar.a.png)
