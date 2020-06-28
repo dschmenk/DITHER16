@@ -39,26 +39,26 @@ Sorry.
  */
 unsigned char buildbrush(unsigned char red, unsigned char grn, unsigned blu, unsigned long *brush)
 {
-    unsigned char clr, v;
+    unsigned char clr, l;
 
     /*
      * Find MAX(R,G,B)
      */
     if (red >= grn && red >= blu)
-        v = red;
+        l = red;
     else if (grn >= red && grn >= blu)
-        v = grn;
+        l = grn;
     else // if (blue >= grn && blu >= red)
-        v = blu;
-    if (v > 127) // 50%-100% brightness
+        l = blu;
+    if (l > 127) // 50%-100% brightness
     {
         /*
          * Fill brush based on scaled RGB values (brightest -> 100% -> 0x0F).
          */
-        brush[BRI] = bdithmask[(v >> 3) & 0x0F];
-        brush[RED] = bdithmask[(red << 4) / (v + 8)];
-        brush[GRN] = bdithmask[(grn << 4) / (v + 8)];
-        brush[BLU] = bdithmask[(blu << 4) / (v + 8)];
+        brush[BRI] = bdithmask[(l >> 3) & 0x0F];
+        brush[RED] = bdithmask[(red << 4) / (l + 8)];
+        brush[GRN] = bdithmask[(grn << 4) / (l + 8)];
+        brush[BLU] = bdithmask[(blu << 4) / (l + 8)];
         clr        = 0x08
                    | ((red & 0x80) >> 5)
                    | ((grn & 0x80) >> 6)
@@ -67,24 +67,30 @@ unsigned char buildbrush(unsigned char red, unsigned char grn, unsigned blu, uns
     else // 0%-50% brightness
     {
         /*
-         * Fill brush based on RGB values.
+         * Fill brush based on dim RGB values.
          */
-        if ((v - red) + (v - grn) + (v - blu) < 8)
+        if ((l - red) + (l - grn) + (l - blu) < 8)
         {
             /*
-             * Fill brush with dark grey dither if RGB mostly grey.
+             * RGB close to grey.
              */
-            if (v > 63)
+            if (l > 63) // 25%-50% grey
             {
-                brush[BRI] = ~ddithmask[((v - 64) >> 2)];
+                /*
+                 * Mix light grey and dark grey.
+                 */
+                brush[BRI] = ~ddithmask[((l - 64) >> 2)];
                 brush[RED] =
                 brush[GRN] =
-                brush[BLU] =  ddithmask[((v - 64) >> 2)];
+                brush[BLU] =  ddithmask[((l - 64) >> 2)];
                 clr        =  0x08;
             }
-            else
+            else // 0%-25% grey
             {
-                brush[BRI] = ddithmask[(v >> 2)];
+                /*
+                 * Simple dark grey dither.
+                 */
+                brush[BRI] = ddithmask[(l >> 2)];
                 brush[RED] = 0;
                 brush[GRN] = 0;
                 brush[BLU] = 0;
@@ -93,6 +99,9 @@ unsigned char buildbrush(unsigned char red, unsigned char grn, unsigned blu, uns
         }
         else
         {
+            /*
+             * Simple 8 color RGB dither.
+             */
             brush[BRI] = 0;
             brush[RED] = ddithmask[red >> 3];
             brush[GRN] = ddithmask[grn >> 3];
@@ -113,24 +122,32 @@ unsigned char buildbrush(unsigned char red, unsigned char grn, unsigned blu, uns
 Color Bars #1
 
 ![Original Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/bars1.jpg)
+
 (gamma 1.55):
+
 ![Dithered Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/bars1.a.png)
 
 
 Color Bars #2
 
 ![Original Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/bars2.jpg)
+
 (gamma 1.55):
+
 ![Dithered Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/bars2.a.png)
 
 Compaq Computers
 
 ![Original Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/compaqs.jpg)
+
 (gamma 1.4):
+
 ![Dithered Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/compaqs.a.png)
 
 Race Car
 
 ![Original Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/racecar.jpg)
+
 (gamma 1.4):
+
 ![Dithered Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/racecar.a.png)
