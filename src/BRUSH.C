@@ -108,25 +108,6 @@ static unsigned long bdithmask[16] = // Color dither
     0xEEFFBBFFL,
     0xFFFFFFFFL
 };
-static unsigned long idithmask[16] = // Brightness dither
-{
-    0x00000000L,
-    0x11000000L,
-    0x11004400L,
-    0x11005500L,
-    0x55005500L,
-    0x55225500L,
-    0x55225588L,
-    0x552255AAL,
-    0x55AA55AAL,
-    0x55BB55AAL,
-    0x55BB55EEL,
-    0x55BB55FFL,
-    0x55FF55FFL,
-    0x77FF55FFL,
-    0x77FFDDFFL,
-    0xFFFFFFFFL,
-};
 static unsigned int pixmask[] =
 {
     0x8008, 0x4008, 0x2008, 0x1008, 0x0808, 0x0408, 0x0208, 0x0108
@@ -198,7 +179,7 @@ unsigned char buildbrush(unsigned char red, unsigned char grn, unsigned blu, uns
         /*
          * Fill brush based on scaled RGB values (brightest -> 100% -> 0x0F).
          */
-        brush[BRI] = idithmask[(v >> 3) & 0x0F]; //  Bright dither is opposit color dither
+        brush[BRI] = bdithmask[(v >> 3) & 0x0F];
         brush[RED] = bdithmask[(red << 4) / (v + 8)];
         brush[GRN] = bdithmask[(grn << 4) / (v + 8)];
         brush[BLU] = bdithmask[(blu << 4) / (v + 8)];
@@ -294,7 +275,7 @@ int main(int argc, char **argv)
         {
             gammafunc = atof(argv[2]);
             for (x = 0; x < 256; x++)
-                gamma[x] = pow((float)x/255.0, gammafunc) * 255.0;
+                gamma[x] = pow((float)x/255.0, gammafunc) * 255.0 + 0.5;
             argc--;
             argv++;
         }
