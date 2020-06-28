@@ -83,7 +83,7 @@ unsigned char buildbrush(unsigned char red, unsigned char grn, unsigned blu, uns
                 brush[RED] =
                 brush[GRN] =
                 brush[BLU] =  ddithmask[((l - 64) >> 2)];
-                clr        =  0x08;
+                clr        =  0x0F;
             }
             else // 0%-25% grey
             {
@@ -94,7 +94,7 @@ unsigned char buildbrush(unsigned char red, unsigned char grn, unsigned blu, uns
                 brush[RED] = 0;
                 brush[GRN] = 0;
                 brush[BLU] = 0;
-                clr        = 0x00;
+                clr        = (l > 31) ? 0x08 : 0x00;
             }
         }
         else
