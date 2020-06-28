@@ -8,7 +8,7 @@ The EGA/VGA palette is constructed to map:
     Plane 2: Red
     Plane 3: Brightness
 
-The colors are mapped so they can be additive: the same bit set in plane 0 as in plane 1 will combine to make Cyan (Blue + Green = Cyan). If the same bit is set in plane 2, then White will result (Blue + Green + Red = White). Plane 3 is mapped to create the high intensity versions of the 8 color combinations.  This makes a simple dither algorithm a little more difficult but manageable when the normal intensity values are seperated from the high intensity values. Thinking of the mapping as a [HSV cone](https://en.wikipedia.org/wiki/HSL_and_HSV) clarifies the process. If V is less than 50% (128), building a simple dithered brush by scaling the RGB values from 0-127 to 0-15 is sufficient. The Brightness value is set to 0. For values of V greater than 50%, it gets a little more interesting. The idea is to scale the RGB values to percentages of V. Note that V = MAX(R,G,B) so by dividing each by V will fill the brush with the percentage of the RGB color. Now, the Brightness can be set to V. However, a little trick here is to reverse the order of the Brightness dither pattern so that the most significant color is brightened first. If the same dither pattern was used as the RGB color values, the least significant colors would be brightened first.
+The colors are mapped so they can be additive: the same bit set in plane 0 as in plane 1 will combine to make Cyan (Blue + Green = Cyan). If the same bit is set in plane 2, then White will result (Blue + Green + Red = White). Plane 3 is mapped to create the high intensity versions of the 8 color combinations.  This makes a simple dither algorithm a little more difficult but manageable when the normal intensity values are seperated from the high intensity values. Thinking of the mapping as a [HSL cone](https://en.wikipedia.org/wiki/HSL_and_HSV) clarifies the process. If L is less than 50% (128), building a simple dithered brush by scaling the RGB values from 0-127 to 0-15 is sufficient. The Brightness value is set to 0. For values of L greater than 50%, it gets a little more interesting. The idea is to scale the RGB values to percentages of L. Note that L = MAX(R,G,B) so by dividing each by L will fill the brush with the percentage of the RGB color. Now, the Brightness can be set to L. R, G  and B can be set to their percentages.
 
 I can see two issues with this algorithm:
 
@@ -22,6 +22,9 @@ The above issues have been addressed in the latest update as well as the plattes
 Finally, the sample program has added a gamma function to adjust the image display. It greatly improves the image on cheap, washed-out LCDs or bright CTRs.
 
 Type: `brush -g 1.5 bars.pnm` (inside DOSBox) to apply a power function to darken the displayed image. A value > 1.0 will lighten the image.
+
+[Update^2]
+The algorithm has been reworked a little to improve image fidelity: the <50% grey dithering has been improved to use the solid grey colors more effectively, and the brightness dither for the >50% colors was incorrect. I tried to be clever and use an orthogonal dither for brightness, but it turns out it wasn't needed and caused unwanted color shifts away from the desired RGB value. The good news is the fix actually simplified the code.
 
 This algorithm was written with clarity in mind, not extreme speed. It is much clearer (and I'm pretty sure a bit faster) than the mess you would find in the Windows driver.
 
