@@ -123,7 +123,7 @@ Color Bars #1
 
 ![Original Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/bars1.jpg)
 
-(gamma 1.55):
+(gamma 1.5):
 
 ![Dithered Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/bars1.a.png)
 
@@ -132,7 +132,7 @@ Color Bars #2
 
 ![Original Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/bars2.jpg)
 
-(gamma 1.55):
+(gamma 1.5):
 
 ![Dithered Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/bars2.a.png)
 
@@ -140,7 +140,7 @@ Compaq Computers
 
 ![Original Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/compaqs.jpg)
 
-(gamma 1.4):
+(gamma 1.5):
 
 ![Dithered Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/compaqs.a.png)
 
@@ -148,6 +148,6 @@ Race Car
 
 ![Original Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/racecar.jpg)
 
-(gamma 1.4):
+(gamma 1.5):
 
 ![Dithered Color Bars](https://github.com/dschmenk/DITHER16/blob/master/images/racecar.a.png)
