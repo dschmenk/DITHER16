@@ -55,7 +55,7 @@ unsigned char buildbrush(unsigned char red, unsigned char grn, unsigned blu, uns
         /*
          * Fill brush based on scaled RGB values (brightest -> 100% -> 0x0F).
          */
-        brush[BRI] = idithmask[(v >> 3) & 0x0F]; //  Bright dither is opposit color dither
+        brush[BRI] = bdithmask[(v >> 3) & 0x0F]; //  Bright dither is opposit color dither
         brush[RED] = bdithmask[(red << 4) / (v + 8)];
         brush[GRN] = bdithmask[(grn << 4) / (v + 8)];
         brush[BLU] = bdithmask[(blu << 4) / (v + 8)];
